@@ -1,6 +1,7 @@
 # Use the vLLM base image
 FROM vllm/vllm-openai:nightly-7ed82d1974837957a3bfb6d576b9cffba24d31ae as base
 
+# Clear any default entrypoint
 ENTRYPOINT []
 
 # Install requirements
@@ -13,7 +14,13 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python && pip install --no-cache-dir \
     transformers-stream-generator==0.0.5 \
     accelerate
 
-# Set the command to run vLLM server
+# Set environment variable to reduce memory fragmentation
+ENV PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
+# Set the command to run vLLM server with memory optimizations
 CMD ["vllm", "serve", "Qwen/Qwen3-VL-30B-A3B-Instruct", \
      "--host", "0.0.0.0", "--port", "8000", \
-     "--trust-remote-code"]
+     "--trust-remote-code", "--max-model-len", "2048", \
+     "--gpu-memory-utilization", "0.7", \
+     "--kv-cache-dtype", "fp8", \
+     "--enforce-eager"]
