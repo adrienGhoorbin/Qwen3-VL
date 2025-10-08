@@ -1,9 +1,8 @@
-# Dockerfile of qwenllm/qwenvl:qwen3vl-cu128
+# Use the vLLM base image
 FROM vllm/vllm-openai:nightly-7ed82d1974837957a3bfb6d576b9cffba24d31ae as base
-ENTRYPOINT []
 
 # Install requirements
-RUN ln -sf /usr/bin/python3 /usr/bin/python &&  pip install --no-cache-dir \
+RUN ln -sf /usr/bin/python3 /usr/bin/python && pip install --no-cache-dir \
     git+https://github.com/huggingface/transformers \
     qwen-vl-utils==0.0.13 \
     torchcodec==0.7 \
@@ -12,5 +11,8 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python &&  pip install --no-cache-dir \
     transformers-stream-generator==0.0.5 \
     accelerate
 
-# Copy web demo script
-COPY web_demo_mm.py ./
+
+# Set the command to run vLLM server
+CMD ["vllm", "serve", "Qwen/Qwen3-VL-7B-Instruct", \
+     "--host", "0.0.0.0", "--port", "8000", \
+     "--trust-remote-code"]
