@@ -17,10 +17,9 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python && pip install --no-cache-dir \
 # Set environment variable to reduce memory fragmentation
 ENV PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
-# Set the command to run vLLM server with memory optimizations
+# Set the command to run vLLM server without FP8 KV cache
 CMD ["vllm", "serve", "Qwen/Qwen3-VL-30B-A3B-Instruct", \
      "--host", "0.0.0.0", "--port", "8000", \
      "--trust-remote-code", "--max-model-len", "2048", \
      "--gpu-memory-utilization", "0.7", \
-     "--kv-cache-dtype", "fp8", \
      "--enforce-eager"]
