@@ -13,6 +13,6 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python && pip install --no-cache-dir \
 
 
 # Set the command to run vLLM server
-CMD ["vllm", "serve", "Qwen/Qwen3-VL-7B-Instruct", \
+CMD ["vllm", "serve", "Qwen/Qwen3-VL-30B-A3B-Instruct", \
      "--host", "0.0.0.0", "--port", "8000", \
      "--trust-remote-code"]
