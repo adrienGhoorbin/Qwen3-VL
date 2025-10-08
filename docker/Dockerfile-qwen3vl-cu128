@@ -1,6 +1,8 @@
 # Use the vLLM base image
 FROM vllm/vllm-openai:nightly-7ed82d1974837957a3bfb6d576b9cffba24d31ae as base
 
+ENTRYPOINT []
+
 # Install requirements
 RUN ln -sf /usr/bin/python3 /usr/bin/python && pip install --no-cache-dir \
     git+https://github.com/huggingface/transformers \
