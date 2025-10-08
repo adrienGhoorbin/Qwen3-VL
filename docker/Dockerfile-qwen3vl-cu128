@@ -14,10 +14,13 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python && pip install --no-cache-dir \
     transformers-stream-generator==0.0.5 \
     accelerate
 
+# Pre-download the model
+RUN python -c "from transformers import AutoTokenizer; AutoTokenizer.from_pretrained('Qwen/Qwen3-VL-30B-A3B-Instruct', trust_remote_code=True)"
+
 # Set environment variable to reduce memory fragmentation
 ENV PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
-# Set the command to run vLLM server without FP8 KV cache
+# Set the command to run vLLM server
 CMD ["vllm", "serve", "Qwen/Qwen3-VL-30B-A3B-Instruct", \
      "--host", "0.0.0.0", "--port", "8000", \
      "--trust-remote-code", "--max-model-len", "2048", \
