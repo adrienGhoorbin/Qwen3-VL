@@ -1,16 +1,28 @@
-# Dockerfile of qwenllm/qwenvl:qwen3vl-cu128
+# Use the vLLM base image
 FROM vllm/vllm-openai:nightly-7ed82d1974837957a3bfb6d576b9cffba24d31ae as base
+
+# Clear any default entrypoint
 ENTRYPOINT []
 
 # Install requirements
-RUN ln -sf /usr/bin/python3 /usr/bin/python &&  pip install --no-cache-dir \
+RUN ln -sf /usr/bin/python3 /usr/bin/python && pip install --no-cache-dir \
     git+https://github.com/huggingface/transformers \
     qwen-vl-utils==0.0.13 \
     torchcodec==0.7 \
-    gradio==5.46.1 \
-    gradio_client==1.13.1 \
+    gradio==4.44.1 \
+    gradio_client==1.3.0 \
     transformers-stream-generator==0.0.5 \
     accelerate
 
-# Copy web demo script
-COPY web_demo_mm.py ./
+# Pre-download the model
+RUN python -c "from transformers import AutoTokenizer; AutoTokenizer.from_pretrained('Qwen/Qwen3-VL-30B-A3B-Instruct', trust_remote_code=True)"
+
+# Set environment variable to reduce memory fragmentation
+ENV PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
+# Set the command to run vLLM server
+CMD ["vllm", "serve", "Qwen/Qwen3-VL-30B-A3B-Instruct", \
+     "--host", "0.0.0.0", "--port", "8000", \
+     "--trust-remote-code", "--max-model-len", "2048", \
+     "--gpu-memory-utilization", "0.7", \
+     "--enforce-eager"]
